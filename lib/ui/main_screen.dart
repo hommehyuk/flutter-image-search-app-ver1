@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_image_search_app_ver1/data/model/imate_item.dart';
+import 'package:flutter_image_search_app_ver1/data/repository/image_item_repository.dart';
 import 'package:flutter_image_search_app_ver1/ui/widget/image_item_widget.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  final repository = ImageItemRepository();
+
+  var imageItems = [];
+
+  Future<void> searchImage(String query) async {
+    imageItems = await repository.getImageItems(query);
+
+    // 강제 UI 업데이트
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,22 +47,21 @@ class MainScreen extends StatelessWidget {
                     ),
                   ),
                   hintText: 'Search',
-                  suffixIcon: const Icon(
-                    Icons.search,
-                    color: Color(0xFF4FB6B2),
+                  suffixIcon: IconButton(
+                    icon: const Icon(
+                      Icons.search,
+                      color: Color(0xFF4FB6B2),
+                    ),
+                    onPressed: () => searchImage('해린'),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               Expanded(
                 child: GridView.builder(
-                  itemCount: 10,
+                  itemCount: imageItems.length,
                   itemBuilder: (context, index) {
-                    final imageItem = ImageItem(
-                      imageUrl:
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTlyQmzyfV-r9wkynwoft-ivRyMIYe0Q_CnA&usqp=CAU',
-                      tags: 'haerin',
-                    );
+                    final imageItem = imageItems[index];
                     return ImageItemWidget(imageItem: imageItem);
                   },
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
